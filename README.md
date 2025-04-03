@@ -66,4 +66,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Disclaimer
 
-This tool is for educational purposes. Please ensure you comply with Google's Terms of Service and SerpAPI's Terms of Service when using this application. 
+This tool is for educational purposes. Please ensure you comply with Google's Terms of Service and SerpAPI's Terms of Service when using this application. # tovil-oti
