@@ -12,6 +12,7 @@ interface Business {
   category?: string;
   hours?: string;
   placeId?: string;
+  email?: string;
 }
 
 interface ResultsTableProps {
@@ -57,6 +58,31 @@ export default function ResultsTable({ businesses }: ResultsTableProps) {
     
     link.setAttribute('href', url);
     link.setAttribute('download', 'חברות_הובלה.csv');
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+  const exportToJSON = () => {
+    // Extract only the fields requested by the user
+    const simplifiedData = businesses.map(business => ({
+      name: business.name || '',
+      phone: business.phone || '',
+      area: business.address || '', // Using address as the "area" field
+      rating: business.rating || '',
+      email: business.email || '', // Use the email field directly from the business object
+    }));
+    
+    // Create a blob with the JSON data
+    const jsonContent = JSON.stringify(simplifiedData, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'חברות_הובלה.json');
     link.style.visibility = 'hidden';
     
     document.body.appendChild(link);
@@ -186,12 +212,20 @@ export default function ResultsTable({ businesses }: ResultsTableProps) {
   return (
     <div className="overflow-x-auto">
       <div className="flex justify-between items-center mb-4">
-        <button 
-          onClick={exportToCSV}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-        >
-          ייצוא ל-CSV
-        </button>
+        <div className="space-x-2 rtl:space-x-reverse">
+          <button 
+            onClick={exportToCSV}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          >
+            ייצוא ל-CSV
+          </button>
+          <button 
+            onClick={exportToJSON}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            ייצוא ל-JSON
+          </button>
+        </div>
         <h2 className="text-xl font-semibold">תוצאות ({businesses.length})</h2>
       </div>
       

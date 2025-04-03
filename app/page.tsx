@@ -15,6 +15,7 @@ type BusinessInfo = {
   category?: string;
   hours?: string;
   placeId?: string;
+  email?: string;
 }
 
 type SearchData = {

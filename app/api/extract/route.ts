@@ -87,17 +87,39 @@ export async function POST(request: Request) {
       }
       
       // Process search results
-      let businesses = searchResponse.local_results.map((result: any) => ({
-        name: result.title,
-        address: result.address,
-        phone: result.phone,
-        website: result.website,
-        rating: result.rating,
-        reviewCount: result.reviews,
-        category: result.categories?.[0],
-        hours: result.hours,
-        placeId: result.place_id
-      }));
+      let businesses = searchResponse.local_results.map((result: any) => {
+        // Try to extract email from various sources
+        let email = '';
+        
+        // Check if there's a description that might contain an email
+        if (result.description) {
+          const emailMatch = result.description.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+          if (emailMatch) {
+            email = emailMatch[0];
+          }
+        }
+        
+        // If no email found and website exists, check if the website contains a mailto link
+        if (!email && result.website && result.website.includes('mailto:')) {
+          const emailMatch = result.website.match(/mailto:([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+          if (emailMatch && emailMatch[1]) {
+            email = emailMatch[1];
+          }
+        }
+        
+        return {
+          name: result.title,
+          address: result.address,
+          phone: result.phone,
+          website: result.website,
+          rating: result.rating,
+          reviewCount: result.reviews,
+          category: result.categories?.[0],
+          hours: result.hours,
+          placeId: result.place_id,
+          email: email // Add the extracted email to the business object
+        };
+      });
       
       // Try to get additional pages of results if available
       if (searchResponse.serpapi_pagination && searchResponse.serpapi_pagination.next) {
@@ -114,17 +136,39 @@ export async function POST(request: Request) {
             
             if (nextPageResponse.local_results && nextPageResponse.local_results.length > 0) {
               // Add results from this page
-              const moreBusinesses = nextPageResponse.local_results.map((result: any) => ({
-                name: result.title,
-                address: result.address,
-                phone: result.phone,
-                website: result.website,
-                rating: result.rating,
-                reviewCount: result.reviews,
-                category: result.categories?.[0],
-                hours: result.hours,
-                placeId: result.place_id
-              }));
+              const moreBusinesses = nextPageResponse.local_results.map((result: any) => {
+                // Try to extract email from various sources
+                let email = '';
+                
+                // Check if there's a description that might contain an email
+                if (result.description) {
+                  const emailMatch = result.description.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+                  if (emailMatch) {
+                    email = emailMatch[0];
+                  }
+                }
+                
+                // If no email found and website exists, check if the website contains a mailto link
+                if (!email && result.website && result.website.includes('mailto:')) {
+                  const emailMatch = result.website.match(/mailto:([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+                  if (emailMatch && emailMatch[1]) {
+                    email = emailMatch[1];
+                  }
+                }
+                
+                return {
+                  name: result.title,
+                  address: result.address,
+                  phone: result.phone,
+                  website: result.website,
+                  rating: result.rating,
+                  reviewCount: result.reviews,
+                  category: result.categories?.[0],
+                  hours: result.hours,
+                  placeId: result.place_id,
+                  email: email // Add the extracted email to the business object
+                };
+              });
               
               businesses = [...businesses, ...moreBusinesses];
               console.log(`Added ${moreBusinesses.length} more businesses from page ${page}`);
