@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       q: keyword,
       type: 'search',
       api_key: apiKey,
-      hl: 'he', // Hebrew language
+      hl: 'en', // Changed from 'he' to 'en' as SerpAPI doesn't support Hebrew
       gl: 'il', // Israel
       num: '100' // Request maximum number of results
     };
